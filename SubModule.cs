@@ -1,8 +1,9 @@
 ﻿using System;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
-using TaleWorlds.MountAndBlade.View.Missions;
+using TaleWorlds.MountAndBlade.View.MissionViews;
 using TaleWorlds.ObjectSystem;
 
 namespace ArtisanBeer
