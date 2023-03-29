@@ -3,6 +3,8 @@ using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.MountAndBlade.View.Missions;
+using TaleWorlds.ObjectSystem;
 
 namespace ArtisanBeer
 {
@@ -21,13 +23,32 @@ namespace ArtisanBeer
             mission.AddMissionBehavior(new ArtisanBeerMissionView());
         }
 
-        protected override void InitializeGameStarter(Game game, IGameStarter starterObject)
+    public class ArtisanBeerMissionView : MissionView
+    {
+        public override void OnMissionScreenTick(float dt)
         {
-            base.InitializeGameStarter(game, starterObject);
-            if (starterObject is CampaignGameStarter starter)
+            base.OnMissionScreenTick(dt);
+
+            if (Input.IsKeyPressed(TaleWorlds.InputSystem.InputKey.Q))
             {
-                starter.AddBehavior(new ArtisanBeerBehavior());
+                DrinkBeer();
             }
+        }
+        private void DrinkBeer()
+        {
+            if (!(Mission.Mode is MissionMode.Battle or MissionMode.Stealth)) return;
+            // Check you actually have artisan beer in inventory
+            var itemRoster = MobileParty.MainParty.ItemRoster;
+            var artisanBeerObject = MBObjectManager.Instance.GetObject<ItemObject>("artisan_beer");
+            if (itemRoster.GetItemNumber(artisanBeerObject) <= 0) return;
+            // Remove one beer
+            itemRoster.AddToCounts(artisanBeerObject, -1);
+            // Increase main character hp
+            var ma = Mission.MainAgent;
+            var oldHealth = ma.Health;
+            ma.Health += 20;
+            if (ma.Health > ma.HealthLimit) ma.Health = ma.HealthLimit;
+            InformationManager.DisplayMessage(new InformationMessage(String.Format("We healed {0} hp", Mission.MainAgent.Health - oldHealth)));
         }
     }
 }
