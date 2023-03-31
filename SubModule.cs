@@ -36,16 +36,18 @@ namespace ArtisanBeer
         }
         private void DrinkBeer()
         {
-            if (!(Mission.Mode is MissionMode.Battle or MissionMode.Stealth)) return;
-            // Check you actually have artisan beer in inventory
+            if (!(Mission.Mode is MissionMode.Battle or MissionMode.Stealth)) return; // If not a Battle or Stealth type mission exit 
+
             var itemRoster = MobileParty.MainParty.ItemRoster;
             var artisanBeerObject = MBObjectManager.Instance.GetObject<ItemObject>("artisan_beer");
-            if (itemRoster.GetItemNumber(artisanBeerObject) <= 0) return;
+            var ma = Mission.MainAgent;
+            var oldHealth = ma.Health;
+            // Check you actually have artisan beer in inventory and your not already at full health otherwise exit
+            if (itemRoster.GetItemNumber(artisanBeerObject) <= 0 || ma.Health >= ma.HealthLimit) return;
             // Remove one beer
             itemRoster.AddToCounts(artisanBeerObject, -1);
             // Increase main character hp
-            var ma = Mission.MainAgent;
-            var oldHealth = ma.Health;
+
             ma.Health += 20;
             if (ma.Health > ma.HealthLimit) ma.Health = ma.HealthLimit;
             InformationManager.DisplayMessage(new InformationMessage(String.Format("We healed {0} hp", Mission.MainAgent.Health - oldHealth)));
